@@ -3,8 +3,7 @@
   <ol>
     <li><a href="#about-the-project">About the project</a></li>
     <ul>
-        <li><a href="#the-diagram">The diagram</a></li>
-        <li><a href="#The-diagram-executing"> The diagram executing</a></li>
+        <li><a href="#The-application"> The application</a></li>
         <li><a href="#How-it-works">How it works</a></li>
     </ul>
     <li><a href="#To-run-the-example-application">To run the example application</a></li>
@@ -13,7 +12,6 @@
     <ul>
         <li><a href="#Future-work">Future work</a></li>
     </ul>
-    <li><a href="#background">Background</a></li>
     <li><a href="#Authors">Authors</a></li>
     <li><a href="#license">License</a></li>
   </ol>
@@ -59,12 +57,12 @@ Peruse the code to see how the dataflow programming paradigm interface works, an
 ## To run the example application
 
 1. Clone this repository or download as a zip.
-2. Open the solution in Visual Studio 2022 or later (this examples uses arithmetic generic, currently only supported in .NET 6 Prerelease 7.)
+2. Open the solution in Visual Studio 2022 or later (this example uses arithmetic in generic types which is at the time of writing  only supported in .NET 6 Preview 7.)
 3. When the application runs, you will see temperature data being displayed which comes from the simulated real device.
 
 ## Built with
 
-C#, Visual Studio 2022 and .NET 6.0 Preview 7
+C#, Visual Studio 2022 (and .NET 6 Preview 7)
 
 
 ## Contributing
