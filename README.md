@@ -28,7 +28,7 @@ It's not about what the application itself does, it's about how all the code mec
 
 The example is in the form a fairly minimal Thermometer console application using one programming paradigm (dataflow) and a handful of domain abstractions.
 
-It uses the console for output, and a simulated ADC (analog to digital converter) hardware as it's data source.
+It uses the console for output, and a simulated ADC (analog to digital converter) hardware as its data source.
 
 
 <!---
