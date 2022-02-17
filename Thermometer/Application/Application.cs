@@ -9,7 +9,7 @@ namespace Application
         /// Instantiate two features: a temperature readout and a load readout.
         /// Also wire the Temperature to the LoadCell for temperature compensation 
         /// </summary>
-        public static async Task Main()
+        public static void Main()
         {
             // Tell the wiring abstraction to log what it is doing to the diagnostic output window
             Wiring.diagnosticOutput += (s) => System.Diagnostics.Debug.WriteLine(s);
