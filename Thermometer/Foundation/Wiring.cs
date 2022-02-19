@@ -65,8 +65,8 @@ namespace Foundation
             var BType = B.GetType();
             var AfieldInfos = A.GetType().GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance) 
                 .Where(fi => fi.FieldType.IsInterface || fi.FieldType.IsGenericType && typeof(System.Collections.IEnumerable).IsAssignableFrom(fi.FieldType))   // filter for fields of interface type
-                .Where(fi => APortName == null || fi.Name == APortName).ToList(); // filter for given portname (if any) 
-            var BinterfaceTypes = BType.GetInterfaces(); // do the reflection once
+                .Where(fi => APortName == null || fi.Name == APortName); // filter for given portname (if any) 
+            var BinterfaceTypes = BType.GetInterfaces().ToList(); // do the reflection once
 
 
             // look through the private fields
