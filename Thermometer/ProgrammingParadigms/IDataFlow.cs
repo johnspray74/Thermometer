@@ -11,24 +11,33 @@ namespace ProgrammingParadigms
 
 
 
+    /// <summary>
+    /// A reverse wired IDataFlow for pulling.
+    /// Unlike IDataFlow which pushes data from source to destination, IDataFlowPull pulls data from source to destination.
+    /// The recever object must be wired _to_ the sender object.
+    /// (The wiring is in the opposite direction of the flow of data, which may be confusing. It is possible to create a pull interface that is wired in the same direction
+    /// as the flow of data, but this would need to use a C# event that returns a value. You couldn't do fan-in, but fan-in doesn't make sense when pulling data anyway - which source would you want?) 
+    /// This is used if you really want to pull data instead of push it. We default to pushing, but pulling may be preferred in some cases for performance reasons
+    /// when the source data changes much more frequently than we are interested in, or calculating the source data is expensive so we want to do it only on demand.
+    /// </summary>
+    /// <typeparam name="T">Generic data type</typeparam>
+    public interface IDataFlowPull<T>
+    {
+        T Pull();
+    }
 
 
-
-    public delegate void DataChangedDelegate();
-
-
+    public delegate void PushDelegate<T>(T data);
 
     /// <summary>
-    /// A reversed IDataFlow.
-    /// IDataFlow pushes data to the destination whereas IDataFlowPull pulls data from source.
-    /// The DataChanged event will notify the destination when change happens.
-    /// This used if you really want to pull data instead of push it. We default to pushing, but pulling may be preferred in some cases for performance reasons
-    /// when the source data changes much more frequently than we are interested in, or calculating the source data is expensive so we want to do it only on demand.
-    /// IDataFlowPush can also be used to solve the problem that a class can't imlement an interface of the same type more than once.
+    /// A reversed wired IDataFlow for pushing.
+    /// Like IDataFlow, IDataFlow_R pushes data from source to the destination. However IDataFlow_R must be wired in the opposite direction from the flow of data.
+    /// At first this doesn't appear to be useful. 
+    /// IDataFlow_R can also be used to solve the problem that a class can't imlement an interface of the same type more than once.
     /// For example, consider implementing an AND gate with 4 inputs all IDatFlow&lt;bool&gt;
-    /// Implementing IDataFlow&lt;bool&gt more than once would create a compiler error
-    /// (It would make sense for the C# compiler to allow multiple named or indexed implementations of the same interface, and for references to be specific to one of them, like delegates)
-    /// As a workaround, to implement the input ports we can use four private fields of type IDataFlowPullB&lt;bool&gt instead:
+    /// Implementing IDataFlow&lt;bool&gt; more than once would create a compiler error
+    /// (It would make sense for the C# compiler to allow multiple named implementations of the same interface, and for references to be specific to one of them, like delegates)
+    /// As a workaround, to implement the input ports we can use four private fields of type IDataFlow_R&lt;bool&gt;:
     /// IDataFlow_B&lt;bool&gt input1;
     /// IDataFlow_B&lt;bool&gt input2;
     /// IDataFlow_B&lt;bool&gt input3;
@@ -37,11 +46,11 @@ namespace ProgrammingParadigms
     /// Each one is generally wired to an instance of a DataFlowConnector - see below
     /// </summary>
     /// <typeparam name="T">Generic data type</typeparam>
-    public interface IDataFlowPull<T>
+    public interface IDataFlow_R<T>
     {
-        T Pull();
-        event DataChangedDelegate DataChanged;
+        event PushDelegate<T> Push;
     }
+
 
 
 
@@ -59,7 +68,7 @@ namespace ProgrammingParadigms
     /// 4. IDataFlow_B<T> implemented interface: ouput port but is wired opposite way from normal.
     /// </summary>
     /// <typeparam name="T">Generic data type</typeparam>
-    public class DataFlowFanout<T> : IDataFlow<T>, IDataFlowPull<T> // input, pull outputs
+    public class DataFlowFanout<T> : IDataFlow<T>, IDataFlowPull<T>, IDataFlow_R<T> // input, pull output, push output
     {
         // properties
         public string InstanceName = "";
@@ -76,21 +85,23 @@ namespace ProgrammingParadigms
         public DataFlowFanout() { }
 
 
-        // IDataFlow<T> implementation ---------------------------------
-        private T data = default;
-
+        // IDataFlow<T> implementation (input) ---------------------------------
         void IDataFlow<T>.Push(T data)
         {
-            this.data = data;
+            this.data = data; // buffer the data in case its needed by the pull output
             foreach (var f in fanoutList) f.Push(data);
-            DataChanged?.Invoke();
+            push_R?.Invoke(data);
             last?.Push(data);
         }
 
-        // IDataFlow_B<T> implementation ---------------------------------
+        // IDataFlowPull<T> implementation ---------------------------------
+        private T data = default;  // used to buffer data for later pull on the output port
         T IDataFlowPull<T>.Pull() { return data; }
 
-        public event DataChangedDelegate DataChanged;
+        // IDataFlow_R<T> implementation ---------------------------------
+        // make explicit so it's not visible without using the interface
+        private event PushDelegate<T> push_R;
+        event PushDelegate<T> IDataFlow_R<T>.Push { add { push_R += value; } remove { push_R -= value; } }
     }
 
 
